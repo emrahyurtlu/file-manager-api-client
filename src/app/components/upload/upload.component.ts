@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FileService} from "../../services/file.service";
 import {HttpEventType} from "@angular/common/http";
 import {TriggerService} from "../../services/trigger.service";
@@ -12,7 +12,9 @@ export class UploadComponent implements OnInit {
 
   public message: string = '';
   public progress: number = 0;
-  @Output() public onUploadFinished = new EventEmitter();
+  // @Output() public onUploadFinished = new EventEmitter();
+  @ViewChild('file')
+  private file: ElementRef | undefined;
 
   constructor(private fileService: FileService, private trigger: TriggerService) {
   }
@@ -35,8 +37,10 @@ export class UploadComponent implements OnInit {
         this.progress = Math.round(100 * e.loaded / e.total)
       } else if (e.type == HttpEventType.Response) {
         this.message = 'Uploaded successfully';
-        this.onUploadFinished.emit(e.body);
+        //this.onUploadFinished.emit(e.body);
         this.trigger.setMessage(true);
+        // @ts-ignore
+        this.file.nativeElement.value = '';
       }
     });
   }
