@@ -1,5 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {FileService} from "../../services/file.service";
+import {HttpEventType} from "@angular/common/http";
+import {TriggerService} from "../../services/trigger.service";
 
 @Component({
   selector: 'app-upload',
@@ -8,7 +10,11 @@ import {FileService} from "../../services/file.service";
 })
 export class UploadComponent implements OnInit {
 
-  constructor(private fileService: FileService) {
+  public message: string = '';
+  public progress: number = 0;
+  @Output() public onUploadFinished = new EventEmitter();
+
+  constructor(private fileService: FileService, private trigger: TriggerService) {
   }
 
   ngOnInit(): void {
@@ -23,6 +29,15 @@ export class UploadComponent implements OnInit {
     const formDate = new FormData();
     formDate.append('file', file, file.name)
 
-    this.fileService.upload(formDate);
+    this.fileService.upload(formDate).subscribe(e => {
+      if (e.type === HttpEventType.UploadProgress) {
+        // @ts-ignore
+        this.progress = Math.round(100 * e.loaded / e.total)
+      } else if (e.type == HttpEventType.Response) {
+        this.message = 'Uploaded successfully';
+        this.onUploadFinished.emit(e.body);
+        this.trigger.setMessage(true);
+      }
+    });
   }
 }
