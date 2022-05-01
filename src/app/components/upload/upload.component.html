@@ -1,0 +1,13 @@
+<h2>Uploading Area</h2>
+<form>
+  <div class="row">
+    <div class="col-12">
+      <input #file class="form-control" id="file" name="file" type="file" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <button (click)="uploadFile(file.files[0])" class="btn btn-primary mt-2 btn-block" type="submit">Upload</button>
+    </div>
+  </div>
+</form>
